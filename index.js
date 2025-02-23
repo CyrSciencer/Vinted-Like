@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const userRoutes = require("./routes/user");
 const offerRoutes = require("./routes/offer");
 //Connection to database
-//mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI);
 //express activation
 
 const serv = express();

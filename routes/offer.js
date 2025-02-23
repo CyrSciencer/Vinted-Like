@@ -1,6 +1,7 @@
 //imports
 const express = require("express");
 const Offer = require("../models/Offer");
+const Account = require("../models/Account");
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 const isAuthenticated = require("../middleware/isAuthenticated");
@@ -21,6 +22,9 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
+      const AccountLinked = await Account.find({
+        token: req.headers.authorization.replace("Bearer ", ""),
+      });
       const pictureToUpload = req.files.picture;
       const convertedPicture = await cloudinary.uploader.upload(
         convertToBase64(pictureToUpload)
@@ -39,12 +43,12 @@ router.post(
           { EMPLACEMENT: city },
         ],
         product_image: convertedPicture.secure_url,
-        owner: req.offerCreator._id,
+        owner: AccountLinked._id,
       });
-      console.log(newOffer);
+      // console.log(AccountLinked._id);
+
       await newOffer.populate("owner", "account _id");
       await newOffer.save();
-      console.log(newOffer);
       res.json(newOffer);
     } catch (error) {
       console.log(error);
