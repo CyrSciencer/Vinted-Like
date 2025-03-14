@@ -146,8 +146,8 @@ router.get("/offers", async (req, res) => {
         .populate("owner", "account _id");
       return offers;
     };
-
-    res.json(await sorting(filter, sort, page));
+    const offers = sorting(filter, sort, page);
+    res.json(await offers);
   } catch (error) {
     console.log(error);
 
