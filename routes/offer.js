@@ -142,7 +142,8 @@ router.get("/offers", async (req, res) => {
         .sort({ product_price: sorting })
         .skip(offerPerPage * (page - 1))
         .limit(offerPerPage)
-        .select(selection);
+        .select(selection)
+        .populate("owner", "account _id");
       return offers;
     };
 
