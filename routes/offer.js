@@ -134,7 +134,8 @@ router.get("/offers", async (req, res) => {
       sort = "asc";
     }
     //offerSortingfunctions
-    const selection = "product_name product_price";
+    const selection =
+      "product_name product_price product_description product_details product_image owner";
     const offerPerPage = 15;
     const sorting = async (filter, sorting, page) => {
       const offers = await Offer.find(filter)
@@ -144,8 +145,8 @@ router.get("/offers", async (req, res) => {
         .select(selection);
       return offers;
     };
-    console.log(filter);
-    res.json(await sorting(filter, sort, page, "Hallo"));
+
+    res.json(await sorting(filter, sort, page));
   } catch (error) {
     console.log(error);
 
