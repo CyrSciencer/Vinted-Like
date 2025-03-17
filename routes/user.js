@@ -5,7 +5,8 @@ const Account = require("../models/Account");
 const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
 const uid2 = require("uid2");
-import placeholder from "../img/placeholder.jpg";
+const fileUpload = require("express-fileupload");
+
 //Inter-route creation
 const router = express.Router();
 //User routes
@@ -20,14 +21,18 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
       //   console.log("taken");
       res.status(409).json({ message: "Email already taken" });
     } else {
-      if (req.files.picture) {
+      // console.log(1);
+
+      if (req.files) {
         const pictureToUpload = req.files.picture;
         const convertedPicture = await cloudinary.uploader.upload(
           convertToBase64(pictureToUpload)
         );
         avatarImg = convertedPicture.secure_url;
+        // console.log(2);
       } else {
-        avatarImg = placeholder;
+        avatarImg = null;
+        // console.log(3);
       }
 
       const password = req.body.password;
@@ -36,13 +41,14 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
         email: req.body.email,
         account: {
           username: req.body.username,
-          avatar: convertedPicture.secure_url,
+          avatar: avatarImg,
         },
         newsletter: req.body.newsletter,
         token: uid2(64),
         salt: salt,
         hash: SHA256(password + salt).toString(encBase64),
       });
+      console.log(newAccount);
 
       await newAccount.save();
       res.json({
