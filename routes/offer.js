@@ -22,9 +22,11 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
-      const AccountLinked = await Account.find({
+      const AccountLinked = await Account.findOne({
         token: req.headers.authorization.replace("Bearer ", ""),
       });
+      console.log("ici =>", AccountLinked);
+
       const pictureToUpload = req.files.picture;
       const convertedPicture = await cloudinary.uploader.upload(
         convertToBase64(pictureToUpload)
