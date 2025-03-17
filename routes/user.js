@@ -1,36 +1,48 @@
 //All imports
+const cloudinary = require("cloudinary").v2;
 const express = require("express");
 const Account = require("../models/Account");
 const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
 const uid2 = require("uid2");
+import placeholder from "../img/placeholder.jpg";
 //Inter-route creation
 const router = express.Router();
 //User routes
-router.post("/user/signup", async (req, res) => {
+router.post("/user/signup", fileUpload(), async (req, res) => {
   try {
     if (!req.body.username || !req.body.password || !req.body.email) {
       return res.status(400).json({ message: "Missing input" });
     }
     const checkAccount = await Account.findOne({ email: req.body.email });
+    let avatarImg;
     if (checkAccount) {
       //   console.log("taken");
       res.status(409).json({ message: "Email already taken" });
     } else {
+      if (req.files.picture) {
+        const pictureToUpload = req.files.picture;
+        const convertedPicture = await cloudinary.uploader.upload(
+          convertToBase64(pictureToUpload)
+        );
+        avatarImg = convertedPicture.secure_url;
+      } else {
+        avatarImg = placeholder;
+      }
+
       const password = req.body.password;
       const salt = uid2(16);
       const newAccount = new Account({
         email: req.body.email,
         account: {
           username: req.body.username,
-          avatar: {},
+          avatar: convertedPicture.secure_url,
         },
         newsletter: req.body.newsletter,
         token: uid2(64),
         salt: salt,
         hash: SHA256(password + salt).toString(encBase64),
       });
-      //   console.log("ok");
 
       await newAccount.save();
       res.json({
