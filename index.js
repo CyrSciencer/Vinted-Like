@@ -13,7 +13,27 @@ mongoose.connect(process.env.MONGODB_URI);
 // mongoose.connect("mongodb://127.0.0.1:27017/vintedLike");
 //express activation
 const serv = express();
-serv.use(cors());
+
+const allowedOrigins = [
+  "http://localhost:5174", // Your local dev frontend
+  "https://vintedlike.netlify.app", // Replace with your deployed frontend URL if you have one
+  // Add any other origins you need to allow
+];
+
+serv.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 //Used by serv
 serv.use(express.json());
