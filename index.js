@@ -13,8 +13,13 @@ mongoose.connect(process.env.MONGODB_URI);
 // mongoose.connect("mongodb://127.0.0.1:27017/vintedLike");
 //express activation
 const serv = express();
-
-serv.use(cors());
+const corsOptions = {
+  origin: "https://vintedlike.netlify.app",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // If you need to handle cookies or auth headers
+  allowedHeaders: "Content-Type, Authorization",
+};
+serv.use(cors(corsOptions));
 
 //Used by serv
 serv.use(express.json());
